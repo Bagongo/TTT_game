@@ -1,0 +1,29 @@
+body{
+	height: 100%;
+	width: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+#flex-container{
+	display: flex;
+	flex-flow: column nowrap;
+	align-items: center;
+	justify-content: center;
+}
+
+#board{
+	width: 500px;
+	height: 500px;
+	display: flex;
+	flex-flow: row wrap;
+	justify-content: space-around;
+	align-items: center;
+}
+
+.slot{
+	position: relative;
+	width: 30%;
+	height:30%;
+	background-color: azure;
+}
