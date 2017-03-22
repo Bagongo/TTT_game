@@ -1,4 +1,4 @@
-body{
+body, html{
 	height: 100%;
 	width: 100%;
 	margin: 0;
@@ -6,6 +6,8 @@ body{
 }
 
 #flex-container{
+	height: 100%;
+	width: 100%;
 	display: flex;
 	flex-flow: column nowrap;
 	align-items: center;
@@ -13,17 +15,22 @@ body{
 }
 
 #board{
-	width: 500px;
-	height: 500px;
+	width: 250px;
+	height: 250px;
 	display: flex;
 	flex-flow: row wrap;
 	justify-content: space-around;
 	align-items: center;
+	background-color: black;
 }
 
 .slot{
 	position: relative;
 	width: 30%;
 	height:30%;
-	background-color: azure;
+	display: flex;
+	flex-flow: column;
+	align-items: center;
+	justify-content: center;
+	background-color: lightgray;
 }
