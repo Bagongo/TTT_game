@@ -3,6 +3,7 @@ window.onload = function(){
 	var board = [["E", "E", "E"], ["E", "E", "E"], ["E", "E", "E"]];
 	var state = "continue";
 	var currPlayer = "X";
+	var totalMoves = 0;
 
 	var display = document.getElementById("display");
 	var slots = document.getElementsByClassName("slot");
@@ -17,6 +18,7 @@ window.onload = function(){
 		if(board[this.dataset.posx][this.dataset.posy] !== "E" || state !== "continue")
 			return;
 
+		totalMoves++;
 		board[this.dataset.posx][this.dataset.posy] = currPlayer;
 		this.innerHTML = currPlayer;
 		evaluateState();
@@ -29,25 +31,11 @@ window.onload = function(){
 
 	function evaluateState()
 	{
-		if(!emptySlotsLeft())
+		if(totalMoves >= 9)
 			state = "draw";
 		
 		if (winningPositions().length > 0)
 			state = currPlayer + " wins!";
-	}
-
-	function emptySlotsLeft()
-	{
-		for(var i=0; i < board.length; i++)
-		{
-			for(var j=0; j < board[i].length; j++)
-			{
-				if(board[i][j] === "E")
-					return true;
-			}
-		}
-
-		return false;
 	}
 
 	function winningPositions()
@@ -83,6 +71,7 @@ window.onload = function(){
 	function resetState()
 	{
 		state = "continue";
+		totalMoves = 0;
 		currPlayer = "X";
 		display.innerHTML = "play!";
 		resetBoard();
