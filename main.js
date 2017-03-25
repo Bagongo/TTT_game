@@ -3,7 +3,7 @@ window.onload = function(){
 	var gameBoard = [["E", "E", "E"], ["E", "E", "E"], ["E", "E", "E"]];
 	var state = "continue";
 	var currPlayer = "X";
-	var multiPlayer = false;
+	var multiPlayer = true;
 
 	var display = document.getElementById("display");
 	var slots = document.getElementsByClassName("slot");
@@ -11,7 +11,7 @@ window.onload = function(){
 	for(var i=0; i < slots.length; i++)
 		slots[i].addEventListener("click", slotClicked);
 
-	document.getElementById("new-game").addEventListener("click", resetState);
+	document.getElementById("new-game").addEventListener("click", resetGame);
 
 	function slotClicked()
 	{
@@ -36,7 +36,7 @@ window.onload = function(){
 		gameBoard[pos.y][pos.x] = player;
 	}
 
-	function turnManager(ai)
+	function turnManager(lastMoveWasAI)
 	{
 		evaluateState(gameBoard);
 
@@ -44,13 +44,10 @@ window.onload = function(){
 			resolveGame(gameBoard);
 		else
 		{
-			if(multiPlayer)
-				currPlayer = currPlayer === "X" ? "O" : "X";
-			else
-			{
-				if(!ai)
-					AIMove();
-			}
+			currPlayer = currPlayer === "X" ? "O" : "X";
+
+			if(!multiPlayer && !lastMoveWasAI)
+				AIMove();
 		}			
 	}
 
@@ -78,9 +75,9 @@ window.onload = function(){
 		return false;
 	}
 
-	function winningPositions(board)
+	function winningPositions(board) //detects winning state and returns positions of the winning chain
 	{
-		winPositions = []; //holds the positions of the slots forming the winning chain
+		winPositions = []; //holds positions of the slots forming the winning chain
 
 		for(var i=0; i < board.length; i++) //check rows
 		{
@@ -108,7 +105,7 @@ window.onload = function(){
 		display.innerHTML = state;
 	}
 
-	function resetState()
+	function resetGame()
 	{
 		state = "continue";
 		currPlayer = "X";
