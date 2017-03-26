@@ -2,16 +2,24 @@ window.onload = function(){
 
 	var gameBoard = [["E", "E", "E"], ["E", "E", "E"], ["E", "E", "E"]];
 	var state = "continue";
-	var currPlayer = "X";
-	var multiPlayer = true;
+	var settings = {multiplayer: null, player1:"", player2:""};
+	var turn = "X";
 
 	var display = document.getElementById("display");
+	var boarRef = document.getElementById("board");
 	var slots = document.getElementsByClassName("slot");
-
 	for(var i=0; i < slots.length; i++)
 		slots[i].addEventListener("click", slotClicked);
 
-	document.getElementById("new-game").addEventListener("click", resetGame);
+	var buttons = document.getElementById("button-box").getElementsByClassName("btn");
+	buttons[0].addEventListener("click", startSetup);
+	buttons[1].addEventListener("click", showQuote);
+	buttons[2].addEventListener("click", selectGameMode);
+	buttons[3].addEventListener("click", selectGameMode);
+	buttons[4].addEventListener("click", selectSeed);
+	buttons[5].addEventListener("click", selectSeed);
+	buttons[6].addEventListener("click", startSetup);
+	buttons[7].addEventListener("click", restartGame);
 
 	function slotClicked()
 	{
@@ -21,7 +29,7 @@ window.onload = function(){
 		if(gameBoard[posY][posX] !== "E" || state !== "continue")
 			return;
 
-		makeMove(currPlayer, {x:posX, y:posY});
+		makeMove(turn, {x:posX, y:posY});
 		turnManager(false);
 	}
 
@@ -44,9 +52,10 @@ window.onload = function(){
 			resolveGame(gameBoard);
 		else
 		{
-			currPlayer = currPlayer === "X" ? "O" : "X";
+			turn = turn === settings.player1 ? settings.player2 : settings.player1;
+			display.innerHTML = turn + " to move";
 
-			if(!multiPlayer && !lastMoveWasAI)
+			if(!settings.multiplayer && !lastMoveWasAI)
 				AIMove();
 		}			
 	}
@@ -57,7 +66,7 @@ window.onload = function(){
 			state = "draw";
 		
 		if (winningPositions(board).length > 0)
-			state = currPlayer + " wins!";
+			state = turn + " wins!";
 	}
 
 
@@ -105,12 +114,13 @@ window.onload = function(){
 		display.innerHTML = state;
 	}
 
-	function resetGame()
+	function restartGame()
 	{
-		state = "continue";
-		currPlayer = "X";
-		display.innerHTML = "play!";
+		boarRef.style.display = "flex";
 		resetBoard(gameBoard);
+		state = "continue";
+		turn = settings.player1;
+		display.innerHTML = turn + " to move.";
 	}
 
 	function resetBoard(board)
@@ -131,23 +141,16 @@ window.onload = function(){
 		     return arr.slice();
 		});
 
-		var move = findBestMove("O", board);
-
-		console.log(move);
-
-		makeMove("O", move);
+		var move = findBestMove(board);
+		makeMove(settings.player2, move);
 		turnManager(true);
 	}
 
-
-	var minimaxCounter = 0;
 	// This is the minimax function. It considers all
 	// the possible ways the game can go and returns
 	// the value of the board
-	function minimax(board, depth, isMax, seeds)
+	function minimax(board, depth, isMax)
 	{
-
-		minimaxCounter++;
 		var best;	 
 	    // If Maximizer has won the game return his/her
 	    // evaluated score
@@ -178,11 +181,11 @@ window.onload = function(){
 	                if (board[i][j] === 'E')
 	                {
 	                    // Make the move
-	                    board[i][j] = seeds.ai;
+	                    board[i][j] = settings.player2;
 
 	                    // Call minimax recursively and choose
 	                    // the maximum value
-	                    best = Math.max(best, minimax(board, depth+1, !isMax, seeds));
+	                    best = Math.max(best, minimax(board, depth+1, !isMax));
 	 
 	                    // Undo the move
 	                    board[i][j] = 'E';
@@ -206,11 +209,11 @@ window.onload = function(){
 	                if (board[y][x] === 'E')
 	                {
 	                    // Make the move
-	                    board[y][x] = seeds.player;
+	                    board[y][x] = settings.player1;
 	 
 	                    // Call minimax recursively and choose
 	                    // the minimum value
-	                    best = Math.min(best, minimax(board, depth+1, !isMax, seeds));
+	                    best = Math.min(best, minimax(board, depth+1, !isMax));
 	 
 	                    // Undo the move
 	                    board[y][x] = 'E';
@@ -222,10 +225,8 @@ window.onload = function(){
 	}
 
 	// This will return the best possible move for the player
-	function findBestMove(seed, board)
+	function findBestMove(board)
 	{		
-		var seeds = {ai:seed, 
-					 player:(seed === "X") ? "0" : "X"};
 	    var bestVal = -1000;
 	    var bestMove = {};
 	 
@@ -240,13 +241,11 @@ window.onload = function(){
 	            if (board[i][j] === 'E')
 	            {
 	                // Make the move
-	                board[i][j] = seeds.ai;
+	                board[i][j] = settings.player2;
 	 
 	                // compute evaluation function for this
 	                // move.
-	                var moveVal = minimax(board, 0, false, seeds);
-
-	                console.log(moveVal + " " + i + " " + j);
+	                var moveVal = minimax(board, 0, false);
 	 
 	                // Undo the move
 	                board[i][j] = 'E';
@@ -264,10 +263,77 @@ window.onload = function(){
 	        }
 	    }
 
-	    console.log(minimaxCounter);
-	    minimaxCounter = 0;
-	 
 	    return bestMove;
 	}
+
+	function bootGame()
+	{
+		hideAllButtons(); 
+		printToDisplay("Wanna play a game?", function(){showButtons([0, 1]);});
+	}
+
+	function startSetup()
+	{
+		boarRef.style.display = "none";
+		resetBoard(gameBoard);
+		hideAllButtons(); 
+		printToDisplay("Choose your opponent", function(){showButtons([2, 3]);});
+	}
+
+	function selectGameMode(value)
+	{
+		hideAllButtons(); 
+		settings.multiplayer = this.innerHTML === "human";
+		printToDisplay("Choose your symbol", function(){showButtons([4, 5]);});
+	}
+
+	function selectSeed()
+	{
+		hideAllButtons(); 
+		settings.player1 = turn = this.innerHTML;
+		settings.player2 = settings.player1 === "X" ? "O" : "X";
+		showButtons([6, 7]);
+		restartGame();
+	}
+
+	function showQuote()
+	{
+		hideAllButtons(); 
+		printToDisplay("A strange game. The only winning move is not to play...", function(){
+			setTimeout(bootGame, 1500);
+		});
+	}
+
+	function showButtons(idxs)
+	{
+		buttons[idxs[0]].style.display = "flex";
+		buttons[idxs[1]].style.display = "flex";
+	}
+
+	function hideAllButtons()
+	{
+		for(var j=0; j < buttons.length; j++)
+			buttons[j].style.display = "none";
+	}
+
+	function printToDisplay(string, callback)
+	{
+		display.innerHTML = "";
+
+		for(i=0; i < string.length; i++)
+			doScaledTimeout(i);
+
+		function doScaledTimeout(idx) 
+		{
+			setTimeout(function(){
+				display.innerHTML += string[idx];
+
+				if(idx >= string.length - 1)
+					setTimeout(callback, 500);
+			}, idx * 100);
+		}
+	}
+
+	bootGame();
 
 };

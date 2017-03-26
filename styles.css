@@ -6,6 +6,7 @@ body, html{
 }
 
 #flex-container{
+	position: relative;
 	height: 100%;
 	width: 100%;
 	display: flex;
@@ -17,7 +18,7 @@ body, html{
 #board{
 	width: 250px;
 	height: 250px;
-	display: flex;
+	display: none;
 	flex-flow: row wrap;
 	justify-content: space-around;
 	align-items: center;
@@ -33,4 +34,25 @@ body, html{
 	align-items: center;
 	justify-content: center;
 	background-color: lightgray;
+}
+
+#button-box{
+	display: flex;
+	flex-flow: row nowrap;
+	justify-content: space-around;
+	align-items: center;
+}
+
+.btn{
+	width: 100px;
+	height: 25px;
+	display: flex;
+	flex-flow: column nowrap;
+	align-items: center;
+	justify-content: center;
+	border: 2px solid gray;
+}
+
+.hidden{
+	display: none;
 }
