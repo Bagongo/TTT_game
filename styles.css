@@ -3,6 +3,10 @@ body, html{
 	width: 100%;
 	margin: 0;
 	padding: 0;
+	font-family: Consolas, Lucida Console, Monaco, Verdana;
+	font-size: 1em;
+	color: #7CC7EE;
+	background-color: #000C1C;
 }
 
 #flex-container{
@@ -15,32 +19,70 @@ body, html{
 	justify-content: center;
 }
 
+#display{
+	margin: 0 20px;
+}
+
 #board{
 	width: 250px;
 	height: 250px;
 	display: none;
 	flex-flow: row wrap;
-	justify-content: space-around;
-	align-items: center;
-	background-color: black;
+	justify-content: space-between;
+	align-content: space-between;
+	margin: 25px 0;
+	background-color: #7CC7EE;
 }
 
 .slot{
 	position: relative;
-	width: 30%;
-	height:30%;
+	width: 31%;
+	height:31%;
 	display: flex;
 	flex-flow: column;
 	align-items: center;
 	justify-content: center;
-	background-color: lightgray;
+	background-color: #000C1C;
 }
 
-#button-box{
+.slot p{
+	font-family: Arial;
+	font-size: 5em;
+	font-weight: bolder;
+	color: #7CC7EE;
+
+    -ms-perspective: 800px;
+	-webkit-perspective: 800px;
+    perspective: 800px;
+	-ms-transform-style: preserve-3d;
+	-webkit-transform-style: preserve-3d;
+	transform-style: preserve-3d;
+
+    transition: all .5s linear;
+}
+
+.flip{
+	-ms-transform: rotateY(180deg);
+	-webkit-transform: rotateY(180deg);
+	transform: rotateY(180deg);
+}
+
+.button-box{
+	width: 300px;
+	height: 75px;
 	display: flex;
+	align-items: center;
+	margin: 15px 0 0 0;
+}
+
+#btns-01{
 	flex-flow: row nowrap;
 	justify-content: space-around;
-	align-items: center;
+}
+
+#btns-02{
+	flex-flow: column-reverse nowrap;
+	justify-content: space-between;
 }
 
 .btn{
@@ -50,9 +92,23 @@ body, html{
 	flex-flow: column nowrap;
 	align-items: center;
 	justify-content: center;
-	border: 2px solid gray;
+	border: 3px solid #7CC7EE;
 }
 
-.hidden{
+.btn:hover{
+	color: #000C1C;
+	background-color: #7CC7EE;
+}
+
+.slot, .btn{
+	-webkit-touch-callout: none; /* iOS Safari */
+	-webkit-user-select: none; /* Safari */
+	-khtml-user-select: none; /* Konqueror HTML */
+	-moz-user-select: none; /* Firefox */
+	-ms-user-select: none; /* Internet Explorer/Edge */
+	user-select: none; 
+}
+
+.no-display{
 	display: none;
 }

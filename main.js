@@ -2,16 +2,21 @@ window.onload = function(){
 
 	var gameBoard = [["E", "E", "E"], ["E", "E", "E"], ["E", "E", "E"]];
 	var state = "continue";
-	var settings = {multiplayer: null, player1:"", player2:""};
-	var turn = "X";
+	var settings = {multiplayer: null, player1:null, player2:null};
+	var turn = null;
+	var startPlayer1 = true;
 
 	var display = document.getElementById("display");
-	var boarRef = document.getElementById("board");
+	var boardRef = document.getElementById("board");
 	var slots = document.getElementsByClassName("slot");
 	for(var i=0; i < slots.length; i++)
+	{
 		slots[i].addEventListener("click", slotClicked);
+		slots[i].firstElementChild.addEventListener("transitionend", function(){this.classList.remove("flip");});
+	}
 
-	var buttons = document.getElementById("button-box").getElementsByClassName("btn");
+	var buttonBoxes = document.getElementsByClassName("button-box");
+	var buttons = document.getElementsByClassName("btn");
 	buttons[0].addEventListener("click", startSetup);
 	buttons[1].addEventListener("click", showQuote);
 	buttons[2].addEventListener("click", selectGameMode);
@@ -19,7 +24,7 @@ window.onload = function(){
 	buttons[4].addEventListener("click", selectSeed);
 	buttons[5].addEventListener("click", selectSeed);
 	buttons[6].addEventListener("click", startSetup);
-	buttons[7].addEventListener("click", restartGame);
+	buttons[7].addEventListener("click", resetGame);
 
 	function slotClicked()
 	{
@@ -30,45 +35,50 @@ window.onload = function(){
 			return;
 
 		makeMove(turn, {x:posX, y:posY});
-		turnManager(false);
+		turnManager(!settings.multiplayer);
 	}
 
 	function makeMove(player, pos)
 	{
-		for(var i=0; i <slots.length; i++)
+		for(var i=0; i < slots.length; i++)
 		{
 			if(slots[i].dataset.posx == pos.x && slots[i].dataset.posy == pos.y)
-				slots[i].innerHTML = player;
+				slots[i].firstElementChild.innerHTML = player;
 		}	
 
 		gameBoard[pos.y][pos.x] = player;
 	}
 
-	function turnManager(lastMoveWasAI)
+	function turnManager(moveAI)
 	{
 		evaluateState(gameBoard);
 
-		if(state !== "continue")
-			resolveGame(gameBoard);
-		else
+		if(state === "begin")
+		{
+			turn = startPlayer1 === true ? settings.player1 : settings.player2;
+			display.innerHTML = turn + " to move";
+			state = "continue";	
+		}
+		else if(state === "continue")
 		{
 			turn = turn === settings.player1 ? settings.player2 : settings.player1;
 			display.innerHTML = turn + " to move";
 
-			if(!settings.multiplayer && !lastMoveWasAI)
+			if(moveAI)
 				AIMove();
-		}			
+		}
+		else
+			resolveGame();
 	}
 
 	function evaluateState(board)
 	{
 		if(!emptySlotsLeft(board))
-			state = "draw";
+			state = "draw!";
 		
 		if (winningPositions(board).length > 0)
 			state = turn + " wins!";
 	}
-
 
 	function emptySlotsLeft(board)
 	{
@@ -97,7 +107,7 @@ window.onload = function(){
 		for(var j=0; j < board[0].length; j++) //check columns
 		{
 			if(board[0][j] !== "E" && board[0][j] === board[1][j] && board[1][j] === board[2][j])
-				winPositions.push([[i,0], [i,1], [i,2]]); 
+				winPositions.push([[0,j], [1,j], [2,j]]); 
 		}
 
 		for(var x=0; x <= 2; x += 2) //check diagonals
@@ -111,16 +121,34 @@ window.onload = function(){
 
 	function resolveGame()
 	{
+		var winPositions = winningPositions(gameBoard);
+
+		for(var i=0; i < winPositions.length; i++)
+		{
+			for(var j=0; j < winPositions[i].length; j++)
+				flipCell(winPositions[i][j]);	
+		}
+
 		display.innerHTML = state;
+
+		if(settings.multiplayer)
+			startPlayer1 = !startPlayer1;
 	}
 
-	function restartGame()
+	function flipCell(pos)
 	{
-		boarRef.style.display = "flex";
+		for(var i=0; i < slots.length; i++)
+		{
+			if(slots[i].dataset.posx == pos[1] && slots[i].dataset.posy == pos[0])
+				slots[i].firstElementChild.classList.add("flip");
+		}
+	}
+
+	function resetGame()
+	{
 		resetBoard(gameBoard);
-		state = "continue";
-		turn = settings.player1;
-		display.innerHTML = turn + " to move.";
+		state = "begin";
+		turnManager(false);
 	}
 
 	function resetBoard(board)
@@ -132,7 +160,7 @@ window.onload = function(){
 		}
 
 		for(var x=0; x < slots.length; x++)
-			slots[x].innerHTML = "";
+			slots[x].firstElementChild.innerHTML = "";
 	}
 
 	function AIMove()
@@ -143,7 +171,7 @@ window.onload = function(){
 
 		var move = findBestMove(board);
 		makeMove(settings.player2, move);
-		turnManager(true);
+		turnManager(false);
 	}
 
 	// This is the minimax function. It considers all
@@ -268,32 +296,35 @@ window.onload = function(){
 
 	function bootGame()
 	{
-		hideAllButtons(); 
 		printToDisplay("Wanna play a game?", function(){showButtons([0, 1]);});
 	}
 
 	function startSetup()
 	{
-		boarRef.style.display = "none";
-		resetBoard(gameBoard);
-		hideAllButtons(); 
+		hideAllButtons();
+		boardRef.style.display = "none";
+		buttonBoxes[0].classList.remove("no-display");
 		printToDisplay("Choose your opponent", function(){showButtons([2, 3]);});
 	}
 
 	function selectGameMode(value)
 	{
 		hideAllButtons(); 
-		settings.multiplayer = this.innerHTML === "human";
+		settings.multiplayer = this.innerHTML === "Human";
 		printToDisplay("Choose your symbol", function(){showButtons([4, 5]);});
 	}
 
 	function selectSeed()
 	{
-		hideAllButtons(); 
-		settings.player1 = turn = this.innerHTML;
+		hideAllButtons();
+		buttonBoxes[0].classList.add("no-display");
+		settings.player1 = this.innerHTML;
 		settings.player2 = settings.player1 === "X" ? "O" : "X";
+		startPlayer1 = true;
+		boardRef.style.display = "flex";
+		buttonBoxes[1].classList.remove("no-display");		
 		showButtons([6, 7]);
-		restartGame();
+		resetGame();
 	}
 
 	function showQuote()
@@ -306,14 +337,14 @@ window.onload = function(){
 
 	function showButtons(idxs)
 	{
-		buttons[idxs[0]].style.display = "flex";
-		buttons[idxs[1]].style.display = "flex";
+		buttons[idxs[0]].classList.remove("no-display");
+		buttons[idxs[1]].classList.remove("no-display");
 	}
 
 	function hideAllButtons()
 	{
 		for(var j=0; j < buttons.length; j++)
-			buttons[j].style.display = "none";
+			buttons[j].classList.add("no-display");
 	}
 
 	function printToDisplay(string, callback)
