@@ -45,19 +45,27 @@ body, html{
 	background-color: #000C1C;
 }
 
-.slot p{
+.inner{
+	height: 80%;
+	width: 80%;
+	display: flex;
+	flex-flow: column nowrap;
+	align-items: center;
+	justify-content: center;
 	font-family: Arial;
 	font-size: 5em;
 	font-weight: bolder;
 	color: #7CC7EE;
-
     -ms-perspective: 800px;
 	-webkit-perspective: 800px;
     perspective: 800px;
 	-ms-transform-style: preserve-3d;
 	-webkit-transform-style: preserve-3d;
 	transform-style: preserve-3d;
-
+	-ms-backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-transition: all .5s linear;
     transition: all .5s linear;
 }
 
@@ -100,7 +108,7 @@ body, html{
 	background-color: #7CC7EE;
 }
 
-.slot, .btn{
+.inner, .btn{
 	-webkit-touch-callout: none; /* iOS Safari */
 	-webkit-user-select: none; /* Safari */
 	-khtml-user-select: none; /* Konqueror HTML */
