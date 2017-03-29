@@ -4,7 +4,6 @@ body, html{
 	margin: 0;
 	padding: 0;
 	font-family: Consolas, Lucida Console, Monaco, Verdana;
-	font-size: 1em;
 	color: #7CC7EE;
 	background-color: #000C1C;
 }
@@ -46,6 +45,7 @@ body, html{
 }
 
 .inner{
+	z-index: 1;
 	height: 80%;
 	width: 80%;
 	display: flex;
@@ -62,11 +62,8 @@ body, html{
 	-ms-transform-style: preserve-3d;
 	-webkit-transform-style: preserve-3d;
 	transform-style: preserve-3d;
-	-ms-backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-    -webkit-transition: all .5s linear;
-    transition: all .5s linear;
+    -webkit-transition: all .4s linear;
+    transition: all .4s linear;
 }
 
 .flip{

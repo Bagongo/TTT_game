@@ -3,7 +3,7 @@ window.onload = function(){
 //////////////////////////////////////////GLOBAL VARS AND LISTENERS///////////////////////////////////////////////////////////////////	
 
 	var gameBoard = [["E", "E", "E"], ["E", "E", "E"], ["E", "E", "E"]]; //representation of the game board, holds players' moves
-	var state = "continue"; //the current state of the game
+	var state = "begin"; //the current state of the game
 	var settings = {multiplayer: null, player1:null, player2:null}; //settings modifiable by user
 	var turn = null; //holds the seed of the player whose current turn is 
 	var startPlayer1 = true; //determines if player1 (or 2) will move first 
@@ -39,7 +39,7 @@ window.onload = function(){
 		var posX = this.dataset.posx;
 		var posY = this.dataset.posy;
 
-		//return if cell not empty full or game's over 
+		//return if clicked cell's not empty or game's over 
 		if(gameBoard[posY][posX] !== "E" || state !== "continue")
 			return;
 
@@ -68,7 +68,7 @@ window.onload = function(){
 		{
 			//determines who's to start the game
 			turn = startPlayer1 === true ? settings.player1 : settings.player2;
-			//shows whose current turn is
+			//prints whose current turn is
 			display.innerHTML = turn + " to move"; 
 			state = "continue";	
 		}
@@ -113,7 +113,7 @@ window.onload = function(){
 	//detects winning state and returns positions of the winning chain
 	function winningPositions(board)
 	{
-		winPositions = []; //holds positions of the slots forming the winning chain
+		winPositions = []; //holds positions of the slots forming the winning chain(s)
 
 		for(var i=0; i < board.length; i++) //check rows
 		{
@@ -210,11 +210,11 @@ window.onload = function(){
 	{
 		var best;
 
-	    // if maximizer has won the game return pos value
+	    // if maximizer has won the game return neg value
 	    if (winningPositions(board).length > 0 && isMax)
 	        return -10;
 	 
-	    // if minimizer has won the game return neg value 
+	    // if minimizer has won the game return pos value 
 	    if (winningPositions(board).length > 0 && !isMax)
 	        return 10;
 	 
@@ -250,7 +250,7 @@ window.onload = function(){
 	        return best;
 	    }
 	 
-	    // If this is minimizer's move works as maximizer but
+	    // If this is minimizer's move - works as maximizer but
 	    // with opposite parameters
 	    else
 	    {
@@ -298,7 +298,7 @@ window.onload = function(){
 	                // Undo the move
 	                board[i][j] = 'E';
 	 
-					//updates best the best value found so far
+					//updates bestVal to the best value found so far
 	                if (moveVal > bestVal)
 	                {
 	                	//stores coordinates of the current best move
@@ -318,7 +318,7 @@ window.onload = function(){
 	//first step of the intro
 	function bootGame()
 	{
-		printToDisplay("Wanna play a game?", function(){showButtons([0, 1]);});
+		printToDisplay("Would you like to play a game?", function(){showButtons([0, 1]);});
 	}
 
 	//shows reference 
@@ -347,7 +347,7 @@ window.onload = function(){
 		printToDisplay("Choose your symbol", function(){showButtons([4, 5]);});
 	}
 
-	//detects and stores user's seed choice and starts the game
+	//final step of set up - detects and stores user's seed choice and starts the game
 	function selectSeed()
 	{
 		hideAllButtons();
